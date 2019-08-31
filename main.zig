@@ -36,6 +36,13 @@ test "div" {
     assert(calc("30 / 7 / 2") == 2);
 }
 
+test "paren" {
+    assert(calc("(3 + 3)") == 6);
+    assert(calc("5 * (3 + 3)") == 30);
+    assert(calc("((5 + 3) * 3)") == 24);
+    assert(calc("20 * ((5 + 3) * 3)") == 480);
+}
+
 test "mix" {
     assert(calc("2 + 3 * 4") == 14);
     assert(calc("2 * 3 + 4") == 10);
@@ -85,7 +92,15 @@ fn mul() i64 {
 
 fn num() i64 {
     skip();
-    var n = i64(curChar() - '0');
+    var c = curChar();
+    if (c == '(') {
+        nextPos();
+        var n = add();
+        nextPos();
+        return n;
+    }
+
+    var n = i64(c - '0');
     nextPos();
     while (isDigit(curChar())) {
         n = n * 10 + i64(curChar() - '0');

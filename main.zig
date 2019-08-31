@@ -3,7 +3,6 @@ const io = std.io;
 const warn = std.debug.warn;
 const assert = std.debug.assert;
 
-// `input` want to be got from STDIN.
 var input: []const u8 = undefined;
 
 var cur_pos: u32 = 0;
@@ -24,6 +23,24 @@ test "sub" {
     assert(calc("1-1") == 0);
     assert(calc("1 - 2") == -1);
     assert(calc("120 - 210") == -90);
+    assert(calc("99999999999999999 - 1") == 99999999999999998);
+}
+
+test "mul" {
+    assert(calc("1024 * 1024") == 1048576);
+    assert(calc("2 * 2 * 2 * 2") == 16);
+}
+
+test "div" {
+    assert(calc("30 / 7") == 4);
+    assert(calc("30 / 7 / 2") == 2);
+}
+
+test "mix" {
+    assert(calc("2 + 3 * 4") == 14);
+    assert(calc("2 * 3 + 4") == 10);
+    assert(calc("2 * 4 + 5 * 6") == 38);
+    assert(calc("2 + 4 * 5 + 6") == 28);
 }
 
 fn calc(input_: []const u8) i64 {
@@ -33,15 +50,32 @@ fn calc(input_: []const u8) i64 {
 }
 
 fn add() i64 {
-    var lhs = num();
+    var lhs = mul();
 
     var c = curChar();
     while (c == '+' or c == '-') {
         nextPos();
         if (c == '+') {
-            lhs += num();
+            lhs += mul();
         } else {
-            lhs -= num();
+            lhs -= mul();
+        }
+        c = curChar();
+    }
+
+    return lhs;
+}
+
+fn mul() i64 {
+    var lhs = num();
+
+    var c = curChar();
+    while (c == '*' or c == '/') {
+        nextPos();
+        if (c == '*') {
+            lhs *= num();
+        } else {
+            lhs = @divFloor(lhs, num());
         }
         c = curChar();
     }

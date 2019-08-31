@@ -2,13 +2,14 @@ const std = @import("std");
 const io = std.io;
 const warn = std.debug.warn;
 const assert = std.debug.assert;
+const pow = std.math.pow;
 
 var input: []const u8 = undefined;
 
 var cur_pos: u32 = 0;
 
 pub fn main() void {
-    const result = calc("12 + 34");
+    const result = calc("2 ** 3");
     warn("{} = {}\n", input, result);
 }
 
@@ -41,6 +42,11 @@ test "paren" {
     assert(calc("5 * (3 + 3)") == 30);
     assert(calc("((5 + 3) * 3)") == 24);
     assert(calc("20 * ((5 + 3) * 3)") == 480);
+}
+
+test "pow" {
+    assert(calc("2 ** 10") == 1024);
+    assert(calc("2 ** 10 ** 2") == 1048576);
 }
 
 test "mix" {
@@ -80,7 +86,12 @@ fn mul() i64 {
     while (c == '*' or c == '/') {
         nextPos();
         if (c == '*') {
-            lhs *= num();
+            if (curChar() == '*') {
+                nextPos();
+                lhs = pow(i64, lhs, num());
+            } else {
+                lhs *= num();
+            }
         } else {
             lhs = @divFloor(lhs, num());
         }
@@ -117,7 +128,7 @@ fn skip() void {
 }
 
 fn curChar() u8 {
-    if (input.len <=cur_pos) {
+    if (input.len <= cur_pos) {
         return 0;
     }
     return input[cur_pos];

@@ -1,18 +1,34 @@
 const std = @import("std");
 const io = std.io;
 const warn = std.debug.warn;
+const assert = std.debug.assert;
 
 // `input` want to be got from STDIN.
-const input = "2+3";
+var input: []const u8 = undefined;
 
 var cur_pos: u32 = 0;
 
 pub fn main() void {
-    const result = calc();
+    const result = calc("12 + 34");
     warn("{} = {}\n", input, result);
 }
 
-fn calc() i64 {
+test "add" {
+    assert(calc(" 1+1 ") == 2);
+    assert(calc("10+3") == 13);
+    assert(calc("12 + 34") == 46);
+    assert(calc("99999999999999999 + 9999999999999999") == 109999999999999998);
+}
+
+test "sub" {
+    assert(calc("1-1") == 0);
+    assert(calc("1 - 2") == -1);
+    assert(calc("120 - 210") == -90);
+}
+
+fn calc(input_: []const u8) i64 {
+    input = input_;
+    cur_pos = 0;
     return add();
 }
 
@@ -35,13 +51,13 @@ fn add() i64 {
 
 fn num() i64 {
     skip();
-    
-    var n = curChar() - '0';
+    var n = i64(curChar() - '0');
     nextPos();
     while (isDigit(curChar())) {
-        n = n * 10 + (curChar() - '0');
+        n = n * 10 + i64(curChar() - '0');
         nextPos();
     }
+    skip();
     return n;
 }
 
